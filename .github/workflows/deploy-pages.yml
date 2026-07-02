@@ -44,6 +44,7 @@ jobs:
           cat > packages/web/next.config.js << 'EOF'
           /** @type {import('next').NextConfig} */
           const nextConfig = {
+            basePath: '/lsp-ai-audit',
             output: 'export',
             images: { unoptimized: true },
             transpilePackages: ['@lsp/ui', '@lsp/shared', '@lsp/viz'],
