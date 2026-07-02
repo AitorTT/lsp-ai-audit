@@ -1,0 +1,74 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Clients</h1>
+      <p class="page-subtitle">Manage client organizations</p>
+    </div>
+    <a routerLink="/dashboard/clients/new" class="btn btn-primary">New Client</a>
+  </div>
+
+  <div class="search-bar">
+    <input
+      type="text"
+      placeholder="Search clients by name..."
+      [(ngModel)]="search"
+      (ngModelChange)="onSearch()"
+    />
+  </div>
+
+  <div class="card" *ngIf="!loading && !error && clients.length === 0">
+    <div class="empty-state">
+      <p>No clients found</p>
+    </div>
+  </div>
+
+  <div class="card" *ngIf="error">
+    <div class="error-state">
+      <p>{{ error }}</p>
+    </div>
+  </div>
+
+  <div class="card" *ngIf="loading">
+    <div class="loading-state">
+      <p>Loading clients...</p>
+    </div>
+  </div>
+
+  <div class="card" *ngIf="!loading && !error && clients.length > 0">
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Employees</th>
+            <th>Languages</th>
+            <th>Audits</th>
+            <th>Created</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let client of clients" (click)="rowClick(client.id)">
+            <td>{{ client.name }}</td>
+            <td><span [class]="typeBadge(client.type)">{{ client.type }}</span></td>
+            <td>{{ client.employeeCount }}</td>
+            <td><span class="language-count">{{ client.primaryLanguages.length || 0 }}</span></td>
+            <td>{{ ($any(client).auditCount ?? 0) }}</td>
+            <td>{{ client.createdAt | date:'shortDate' }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="pagination" *ngIf="totalPages > 1">
+      <button (click)="goToPage(page - 1)" [disabled]="page <= 1">Prev</button>
+      <button
+        *ngFor="let p of pages"
+        (click)="goToPage(p)"
+        [class.active]="p === page"
+      >{{ p }}</button>
+      <button (click)="goToPage(page + 1)" [disabled]="page >= totalPages">Next</button>
+      <span>Page {{ page }} of {{ totalPages }} ({{ total }} total)</span>
+    </div>
+  </div>
+</div>

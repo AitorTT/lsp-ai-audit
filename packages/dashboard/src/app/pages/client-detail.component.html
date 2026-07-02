@@ -1,0 +1,105 @@
+<div class="page">
+  <a routerLink="/dashboard/clients" class="back-link">&larr; Back to Clients</a>
+
+  <div class="loading-state" *ngIf="loading">
+    <p>Loading client details...</p>
+  </div>
+
+  <div class="error-state" *ngIf="error">
+    <p>{{ error }}</p>
+  </div>
+
+  <ng-container *ngIf="!loading && !error && client">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+      <div>
+        <h1 class="page-title">{{ client.name }}</h1>
+        <p class="page-subtitle"><span [class]="typeBadge(client.type)">{{ client.type }}</span></p>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="btn btn-primary" (click)="editClient()">Edit Client</button>
+      <button class="btn btn-danger" (click)="deleteClient()">Delete Client</button>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-value">{{ totalAudits }}</div>
+        <div class="stat-label">Total Audits</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">{{ completedAudits }}</div>
+        <div class="stat-label">Completed</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">{{ findingsCount }}</div>
+        <div class="stat-label">Findings</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 class="section-title">Details</h3>
+      <div class="detail-grid">
+        <div class="detail-item">
+          <label>Type</label>
+          <p><span [class]="typeBadge(client.type)">{{ client.type }}</span></p>
+        </div>
+        <div class="detail-item">
+          <label>Employee Count</label>
+          <p>{{ client.employeeCount }}</p>
+        </div>
+        <div class="detail-item">
+          <label>Annual Revenue</label>
+          <p>{{ client.annualRevenue ? '$' + (client.annualRevenue | number:'1.0-0') : 'N/A' }}</p>
+        </div>
+        <div class="detail-item">
+          <label>Website</label>
+          <p>
+            <a *ngIf="client.website" [href]="client.website" target="_blank" class="website-link">{{ client.website }}</a>
+            <span *ngIf="!client.website">N/A</span>
+          </p>
+        </div>
+        <div class="detail-item detail-full" *ngIf="client.description">
+          <label>Description</label>
+          <p>{{ client.description }}</p>
+        </div>
+        <div class="detail-item detail-full">
+          <label>Primary Languages</label>
+          <p>
+            <span *ngIf="client && client.primaryLanguages.length > 0">
+              <span class="language-tag" *ngFor="let lang of client.primaryLanguages">{{ lang }}</span>
+            </span>
+            <span *ngIf="client && !client.primaryLanguages.length">None specified</span>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 class="section-title">Audits</h3>
+      <table *ngIf="audits.length > 0">
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Status</th>
+            <th>Scope</th>
+            <th>Start Date</th>
+            <th>End Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let audit of audits" (click)="rowClick(audit.id)" style="cursor: pointer;">
+            <td>{{ audit.title }}</td>
+            <td>{{ audit.status }}</td>
+            <td>{{ audit.scope }}</td>
+            <td>{{ audit.startDate | date:'shortDate' }}</td>
+            <td>{{ audit.endDate | date:'shortDate' }}</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="empty-state" *ngIf="audits.length === 0">
+        <p>No audits for this client yet</p>
+      </div>
+    </div>
+  </ng-container>
+</div>

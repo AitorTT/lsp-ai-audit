@@ -1,0 +1,76 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Audits</h1>
+      <p class="page-subtitle">Manage and review all audits</p>
+    </div>
+    <a routerLink="/dashboard/audits/new" class="btn btn-primary">New Audit</a>
+  </div>
+
+  <div class="search-bar">
+    <input
+      type="text"
+      placeholder="Search audits by title..."
+      [(ngModel)]="search"
+      (ngModelChange)="onSearch()"
+    />
+  </div>
+
+  <div class="card" *ngIf="!loading && !error && audits.length === 0">
+    <div class="empty-state">
+      <p>No audits found</p>
+    </div>
+  </div>
+
+  <div class="card" *ngIf="error">
+    <div class="error-state">
+      <p>{{ error }}</p>
+    </div>
+  </div>
+
+  <div class="card" *ngIf="loading">
+    <div class="loading-state">
+      <p>Loading audits...</p>
+    </div>
+  </div>
+
+  <div class="card" *ngIf="!loading && !error && audits.length > 0">
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Client</th>
+            <th>Scope</th>
+            <th>Status</th>
+            <th>Start Date</th>
+            <th>End Date</th>
+            <th>Findings</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let audit of audits" (click)="rowClick(audit.id)">
+            <td>{{ audit.title }}</td>
+            <td>{{ audit.clientId }}</td>
+            <td>{{ audit.scope }}</td>
+            <td><span [class]="statusBadge(audit.status)">{{ audit.status }}</span></td>
+            <td>{{ audit.startDate | date:'shortDate' }}</td>
+            <td>{{ audit.endDate | date:'shortDate' }}</td>
+            <td><span class="finding-count">{{ audit.findings.length || 0 }}</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="pagination" *ngIf="totalPages > 1">
+      <button (click)="goToPage(page - 1)" [disabled]="page <= 1">Prev</button>
+      <button
+        *ngFor="let p of pages"
+        (click)="goToPage(p)"
+        [class.active]="p === page"
+      >{{ p }}</button>
+      <button (click)="goToPage(page + 1)" [disabled]="page >= totalPages">Next</button>
+      <span>Page {{ page }} of {{ totalPages }} ({{ total }} total)</span>
+    </div>
+  </div>
+</div>

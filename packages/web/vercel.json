@@ -1,0 +1,6 @@
+{
+  "framework": "nextjs",
+  "buildCommand": "cd ../.. && pnpm build --filter=@lsp/web",
+  "outputDirectory": ".next",
+  "installCommand": "pnpm install"
+}

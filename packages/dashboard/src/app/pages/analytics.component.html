@@ -1,0 +1,105 @@
+<div class="page">
+  <h1 class="page-title">Analytics Dashboard</h1>
+  <p class="page-subtitle">High-level overview of audit activity and findings</p>
+
+  <div class="card" *ngIf="error">
+    <div class="error-state">
+      <p>{{ error }}</p>
+    </div>
+  </div>
+
+  <ng-container *ngIf="loading; else loaded">
+    <div class="kpi-grid">
+      <div class="kpi-card skeleton skeleton-kpi"></div>
+      <div class="kpi-card skeleton skeleton-kpi"></div>
+      <div class="kpi-card skeleton skeleton-kpi"></div>
+      <div class="kpi-card skeleton skeleton-kpi"></div>
+      <div class="kpi-card skeleton skeleton-kpi"></div>
+    </div>
+    <div class="charts-grid">
+      <div class="chart-card skeleton skeleton-chart"></div>
+      <div class="chart-card skeleton skeleton-chart"></div>
+    </div>
+    <div class="section-card skeleton skeleton-table"></div>
+  </ng-container>
+
+  <ng-template #loaded>
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <h3>Total Audits</h3>
+        <div class="kpi-value">{{ metrics?.totalAudits ?? '--' }}</div>
+      </div>
+      <div class="kpi-card">
+        <h3>Completed Audits</h3>
+        <div class="kpi-value">{{ metrics?.completedAudits ?? '--' }}</div>
+      </div>
+      <div class="kpi-card">
+        <h3>Avg Score</h3>
+        <div class="kpi-value">{{ (metrics?.avgScore | number:'1.0-1') ?? '--' }}</div>
+      </div>
+      <div class="kpi-card">
+        <h3>Total Cost Savings</h3>
+        <div class="kpi-value">{{ metrics?.totalCostSavings ? '$' + (metrics?.totalCostSavings | number:'1.0-0') : '--' }}</div>
+      </div>
+      <div class="kpi-card">
+        <h3>Active Clients</h3>
+        <div class="kpi-value">{{ totalClients || '--' }}</div>
+      </div>
+    </div>
+
+    <div class="charts-grid">
+      <div class="chart-card">
+        <h2>Findings by Severity</h2>
+        <div id="severityChart" class="viz-container"></div>
+      </div>
+
+      <div class="chart-card">
+        <h2>Findings by Category</h2>
+        <div id="categoryChart" class="viz-container"></div>
+      </div>
+    </div>
+
+    <div class="section-card">
+      <h2>Audit Status Distribution</h2>
+      <div class="donut-wrap">
+        <div class="donut" [style.background]="donutGradient()"></div>
+        <div class="donut-legend">
+          <div class="donut-legend-item" *ngFor="let s of statusDistribution">
+            <span class="donut-legend-dot" [style.background]="donutColor(s.status)"></span>
+            <span>{{ statusLabel(s.status) }}</span>
+            <span class="donut-legend-count">{{ s.percent }}% ({{ s.count }})</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-card">
+      <h2>Recent Audits</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Status</th>
+              <th>Scope</th>
+              <th>Start Date</th>
+              <th>Findings</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let audit of recentAudits">
+              <td>{{ audit.title }}</td>
+              <td><span [class]="statusBadge(audit.status)">{{ statusLabel(audit.status) }}</span></td>
+              <td>{{ scopeLabel(audit.scope) }}</td>
+              <td>{{ audit.startDate | date:'shortDate' }}</td>
+              <td>{{ audit.findings?.length ?? 0 }}</td>
+            </tr>
+            <tr *ngIf="recentAudits.length === 0">
+              <td colspan="5" style="text-align:center;color:var(--brand-text-secondary);padding:24px;">No recent audits</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </ng-template>
+</div>

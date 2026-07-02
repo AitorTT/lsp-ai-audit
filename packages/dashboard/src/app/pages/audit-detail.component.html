@@ -1,0 +1,105 @@
+<div class="page">
+  <a routerLink="/dashboard/audits" class="back-link">&larr; Back to Audits</a>
+
+  <div class="loading-state" *ngIf="loading">
+    <p>Loading audit details...</p>
+  </div>
+
+  <div class="error-state" *ngIf="error">
+    <p>{{ error }}</p>
+  </div>
+
+  <ng-container *ngIf="!loading && !error && audit">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+      <div>
+        <h1 class="page-title">{{ audit.title }}</h1>
+        <p class="page-subtitle"><span [class]="statusBadge(audit.status)">{{ audit.status }}</span></p>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button
+        *ngFor="let next of statusTransitions"
+        class="btn"
+        [class.btn-primary]="next === 'IN_PROGRESS'"
+        [class.btn-success]="next === 'COMPLETED'"
+        [class.btn-warning]="next === 'REVIEW'"
+        [class.btn-secondary]="next === 'ARCHIVED' || next === 'IN_PROGRESS'"
+        (click)="changeStatus(next)"
+      >Set {{ next }}</button>
+      <button class="btn btn-secondary" (click)="generateReport()">Generate Report</button>
+      <button class="btn btn-secondary" (click)="addFinding()">Add Finding</button>
+    </div>
+
+    <div class="card">
+      <h3 class="section-title">Details</h3>
+      <div class="detail-grid">
+        <div class="detail-item">
+          <label>Client</label>
+          <p>{{ audit.clientId }}</p>
+        </div>
+        <div class="detail-item">
+          <label>Scope</label>
+          <p>{{ audit.scope }}</p>
+        </div>
+        <div class="detail-item">
+          <label>Start Date</label>
+          <p>{{ audit.startDate | date:'longDate' }}</p>
+        </div>
+        <div class="detail-item">
+          <label>End Date</label>
+          <p>{{ audit.endDate | date:'longDate' }}</p>
+        </div>
+        <div class="detail-item detail-full" *ngIf="audit.description">
+          <label>Description</label>
+          <p>{{ audit.description }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 class="section-title">Findings</h3>
+      <table *ngIf="audit.findings?.length">
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Severity</th>
+            <th>Category</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let f of audit.findings">
+            <td>{{ f.title }}</td>
+            <td><span [class]="severityBadge(f.severity)">{{ f.severity }}</span></td>
+            <td>{{ f.category }}</td>
+            <td>{{ f.status }}</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="empty-state" *ngIf="!audit.findings?.length">
+        <p>No findings recorded yet</p>
+      </div>
+    </div>
+
+    <div class="card" *ngIf="report">
+      <h3 class="section-title">Report Summary</h3>
+      <div class="report-summary">
+        <h4>Score: <span class="report-score">{{ report.score }}</span> / 100</h4>
+        <p>{{ report.summary }}</p>
+        <div *ngIf="report.strengths?.length">
+          <strong>Strengths:</strong>
+          <ul><li *ngFor="let s of report.strengths">{{ s }}</li></ul>
+        </div>
+        <div *ngIf="report.weaknesses?.length">
+          <strong>Weaknesses:</strong>
+          <ul><li *ngFor="let w of report.weaknesses">{{ w }}</li></ul>
+        </div>
+        <div *ngIf="report.recommendations?.length">
+          <strong>Recommendations:</strong>
+          <ul><li *ngFor="let r of report.recommendations">{{ r }}</li></ul>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+</div>

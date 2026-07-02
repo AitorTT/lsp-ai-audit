@@ -1,0 +1,68 @@
+<div class="page">
+  <a routerLink="/dashboard/clients" class="back-link">&larr; Back to Clients</a>
+  <h1 class="page-title">{{ pageTitle }}</h1>
+
+  <div class="error-banner" *ngIf="error">{{ error }}</div>
+
+  <div class="card" *ngIf="loading">
+    <p style="color: var(--brand-text-secondary);">Loading client data...</p>
+  </div>
+
+  <div class="card" *ngIf="!loading">
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label for="name">Name *</label>
+        <input id="name" type="text" class="form-control" formControlName="name" />
+        <div class="form-error" *ngIf="form.get('name')?.invalid && form.get('name')?.touched">Name is required</div>
+      </div>
+
+      <div class="form-group">
+        <label for="type">Type *</label>
+        <select id="type" class="form-control" formControlName="type">
+          <option value="">-- Select Type --</option>
+          <option *ngFor="let t of types" [value]="t">{{ t }}</option>
+        </select>
+        <div class="form-error" *ngIf="form.get('type')?.invalid && form.get('type')?.touched">Type is required</div>
+      </div>
+
+      <div class="form-group">
+        <label for="logo">Logo URL</label>
+        <input id="logo" type="text" class="form-control" formControlName="logo" />
+      </div>
+
+      <div class="form-group">
+        <label for="website">Website</label>
+        <input id="website" type="text" class="form-control" formControlName="website" />
+      </div>
+
+      <div class="form-group">
+        <label for="description">Description</label>
+        <textarea id="description" class="form-control" formControlName="description"></textarea>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="employeeCount">Employee Count *</label>
+          <input id="employeeCount" type="number" class="form-control" formControlName="employeeCount" min="0" />
+          <div class="form-error" *ngIf="form.get('employeeCount')?.invalid && form.get('employeeCount')?.touched">Valid employee count is required</div>
+        </div>
+        <div class="form-group">
+          <label for="annualRevenue">Annual Revenue</label>
+          <input id="annualRevenue" type="number" class="form-control" formControlName="annualRevenue" min="0" />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="primaryLanguages">Primary Languages (comma-separated)</label>
+        <input id="primaryLanguages" type="text" class="form-control" formControlName="primaryLanguages" placeholder="e.g. English, Spanish, French" />
+      </div>
+
+      <div class="form-group">
+        <button type="submit" class="btn-primary" [disabled]="form.invalid || submitting">
+          {{ submitting ? 'Saving...' : (isEdit ? 'Update Client' : 'Create Client') }}
+        </button>
+        <a routerLink="/dashboard/clients" class="btn-secondary">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>

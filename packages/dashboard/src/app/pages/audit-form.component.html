@@ -1,0 +1,63 @@
+<div class="page">
+  <a routerLink="/dashboard/audits" class="back-link">&larr; Back to Audits</a>
+  <h1 class="page-title">{{ pageTitle }}</h1>
+
+  <div class="error-banner" *ngIf="error">{{ error }}</div>
+
+  <div class="card" *ngIf="loading">
+    <p style="color: var(--brand-text-secondary);">Loading audit data...</p>
+  </div>
+
+  <div class="card" *ngIf="!loading">
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label for="title">Title *</label>
+        <input id="title" type="text" class="form-control" formControlName="title" />
+        <div class="form-error" *ngIf="form.get('title')?.invalid && form.get('title')?.touched">Title is required</div>
+      </div>
+
+      <div class="form-group">
+        <label for="description">Description</label>
+        <textarea id="description" class="form-control" formControlName="description"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="clientId">Client *</label>
+        <select id="clientId" class="form-control" formControlName="clientId">
+          <option value="">-- Select Client --</option>
+          <option *ngFor="let c of clients" [value]="c.id">{{ c.name }}</option>
+        </select>
+        <div class="form-error" *ngIf="form.get('clientId')?.invalid && form.get('clientId')?.touched">Client is required</div>
+      </div>
+
+      <div class="form-group">
+        <label for="scope">Scope *</label>
+        <select id="scope" class="form-control" formControlName="scope">
+          <option value="">-- Select Scope --</option>
+          <option *ngFor="let s of scopes" [value]="s">{{ s }}</option>
+        </select>
+        <div class="form-error" *ngIf="form.get('scope')?.invalid && form.get('scope')?.touched">Scope is required</div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="startDate">Start Date *</label>
+          <input id="startDate" type="date" class="form-control" formControlName="startDate" />
+          <div class="form-error" *ngIf="form.get('startDate')?.invalid && form.get('startDate')?.touched">Start date is required</div>
+        </div>
+        <div class="form-group">
+          <label for="endDate">End Date *</label>
+          <input id="endDate" type="date" class="form-control" formControlName="endDate" />
+          <div class="form-error" *ngIf="form.get('endDate')?.invalid && form.get('endDate')?.touched">End date is required</div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <button type="submit" class="btn-primary" [disabled]="form.invalid || submitting">
+          {{ submitting ? 'Saving...' : (isEdit ? 'Update Audit' : 'Create Audit') }}
+        </button>
+        <a routerLink="/dashboard/audits" class="btn-secondary">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>

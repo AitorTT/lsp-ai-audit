@@ -1,0 +1,131 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  name         String
+  passwordHash String
+  role         String
+  companyId    String?
+
+  companies Client[]
+  audits    Audit[]
+  uploads   File[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("users")
+}
+
+model Client {
+  id               String   @id @default(uuid())
+  name             String
+  type             String
+  logo             String?
+  website          String?
+  description      String?
+  employeeCount    Int
+  annualRevenue    Float?
+  primaryLanguages String
+  createdById      String
+  createdBy        User     @relation(fields: [createdById], references: [id])
+
+  audits Audit[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("clients")
+}
+
+model Audit {
+  id           String   @id @default(uuid())
+  title        String
+  description  String?
+  scope        String
+  status       String
+  clientId     String
+  consultantId String
+  startDate    DateTime?
+  endDate      DateTime?
+
+  client     Client    @relation(fields: [clientId], references: [id])
+  consultant User      @relation(fields: [consultantId], references: [id])
+  findings   Finding[]
+  report     Report?
+  files      File[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("audits")
+}
+
+model Finding {
+  id             String  @id @default(uuid())
+  auditId        String
+  title          String
+  description    String?
+  severity       String
+  category       String
+  impact         String?
+  recommendation String?
+  effortHours    Float?
+  costSavingsEst Float?
+  status         String  @default("OPEN")
+
+  audit Audit @relation(fields: [auditId], references: [id])
+
+  files File[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("findings")
+}
+
+model Report {
+  id              String   @id @default(uuid())
+  auditId         String   @unique
+  summary         String
+  score           Float
+  strengths       String
+  weaknesses      String
+  recommendations String
+  generatedAt     DateTime
+
+  audit Audit @relation(fields: [auditId], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@map("reports")
+}
+
+model File {
+  id           String  @id @default(uuid())
+  filename     String
+  originalName String
+  mimeType     String
+  size         Int
+  url          String
+  auditId      String?
+  findingId    String?
+  uploadedById String
+
+  audit    Audit?   @relation(fields: [auditId], references: [id])
+  finding  Finding? @relation(fields: [findingId], references: [id])
+  uploadedBy User    @relation(fields: [uploadedById], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("files")
+}
