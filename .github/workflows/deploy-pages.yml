@@ -11,16 +11,10 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-concurrency:
-  group: pages
-  cancel-in-progress: true
+  contents: write
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -40,23 +34,31 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Prepare static export
+        run: |
+          rm -rf packages/web/src/app/\(portal\)
+          cat > packages/web/next.config.js << 'EOF'
+          /** @type {import('next').NextConfig} */
+          const nextConfig = {
+            output: 'export',
+            images: { unoptimized: true },
+            transpilePackages: ['@lsp/ui', '@lsp/shared', '@lsp/viz'],
+            webpack: (config) => {
+              config.resolve.fallback = { fs: false, path: false, crypto: false };
+              return config;
+            },
+          };
+          module.exports = nextConfig;
+          EOF
+
       - name: Build site
         run: pnpm build --filter=@lsp/web
         env:
           NODE_ENV: production
 
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+      - name: Deploy to gh-pages
+        uses: peaceiris/actions-gh-pages@v4
         with:
-          path: packages/web/out
-
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./packages/web/out
+          force_orphan: true

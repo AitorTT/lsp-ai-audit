@@ -192,7 +192,3 @@ export default function ReportPage() {
     </div>
   );
 }
-
-export function generateStaticParams() {
-  return [];
-}

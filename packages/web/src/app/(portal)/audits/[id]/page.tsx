@@ -249,7 +249,3 @@ export default function AuditDetailPage() {
     </div>
   );
 }
-
-export function generateStaticParams() {
-  return [];
-}
